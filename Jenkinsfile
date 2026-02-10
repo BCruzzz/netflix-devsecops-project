@@ -1,4 +1,5 @@
 pipeline {
+
     agent any
 
     tools {
@@ -13,6 +14,9 @@ pipeline {
 
     stages {
 
+        // ============================
+        // 1. Checkout do código
+        // ============================
         stage("Checkout Code") {
             steps {
                 echo "Cloning repository from GitHub..."
@@ -20,41 +24,66 @@ pipeline {
             }
         }
 
+        // ============================
+        // 2. Instalar dependências
+        // ============================
         stage("Install Dependencies") {
             steps {
-                echo "Installing project dependencies..."
+                echo "Installing dependencies with npm..."
                 sh "npm install"
             }
         }
 
+        // ============================
+        // 3. SonarQube Scan (Token Seguro)
+        // ============================
         stage("SonarQube Analysis") {
             steps {
                 echo "Running SonarQube Scan..."
 
                 withSonarQubeEnv("SonarQube") {
+
+                    withCredentials([string(
+                        credentialsId: "SONAR_TOKEN",
+                        variable: "SONAR_TOKEN"
+                    )]) {
+
+                        sh """
+                          sonar-scanner \
+                            -Dsonar.projectKey=Netflix \
+                            -Dsonar.projectName=Netflix \
+                            -Dsonar.host.url=http://172.31.6.195:9000 \
+                            -Dsonar.login=$SONAR_TOKEN
+                        """
+                    }
+                }
+            }
+        }
+
+        // ============================
+        // 4. Docker Build
+        // ============================
+        stage("Docker Build") {
+            steps {
+                echo "Building Docker image..."
+
+                withCredentials([string(
+                    credentialsId: "TMDB_V3_API_KEY",
+                    variable: "TMDB_KEY"
+                )]) {
+
                     sh """
-                      sonar-scanner \
-                        -Dsonar.projectKey=Netflix \
-                        -Dsonar.projectName=Netflix \
-                        -Dsonar.host.url=http://15.228.236.43:9000 \
-                        -Dsonar.login=$SONAR_TOKEN
+                      docker build \
+                        --build-arg TMDB_V3_API_KEY=$TMDB_KEY \
+                        -t ${IMAGE_NAME} .
                     """
                 }
             }
         }
 
-        stage("Docker Build") {
-            steps {
-                echo "Building Docker image..."
-
-                sh """
-                  docker build \
-                    --build-arg TMDB_V3_API_KEY=$TMDB_V3_API_KEY \
-                    -t ${IMAGE_NAME} .
-                """
-            }
-        }
-
+        // ============================
+        // 5. Push para DockerHub
+        // ============================
         stage("Push Image to DockerHub") {
             steps {
                 echo "Pushing image to DockerHub..."
@@ -64,6 +93,7 @@ pipeline {
                     usernameVariable: "DOCKER_USER",
                     passwordVariable: "DOCKER_PASS"
                 )]) {
+
                     sh """
                       echo \$DOCKER_PASS | docker login -u \$DOCKER_USER --password-stdin
                       docker push ${IMAGE_NAME}
@@ -72,7 +102,10 @@ pipeline {
             }
         }
 
-        stage("Deploy to EKS") {
+        // ============================
+        // 6. Deploy no Kubernetes (EKS)
+        // ============================
+        stage("Deploy to AWS EKS") {
 
             environment {
                 AWS_ACCESS_KEY_ID     = credentials("aws-access-key")
@@ -80,31 +113,37 @@ pipeline {
             }
 
             steps {
-                echo "Deploying application to AWS EKS..."
+                echo "Deploying application to EKS..."
 
                 sh """
-                  aws eks update-kubeconfig --region ${AWS_REGION} --name ${EKS_CLUSTER}
+                  aws eks update-kubeconfig \
+                    --region ${AWS_REGION} \
+                    --name ${EKS_CLUSTER}
 
-                  echo "Kubernetes Cluster Nodes:"
+                  echo "Cluster Nodes:"
                   kubectl get nodes
 
                   echo "Applying Kubernetes manifests..."
                   kubectl apply -f k8s/
 
-                  echo "Waiting for rollout..."
+                  echo "Waiting for deployment rollout..."
                   kubectl rollout status deployment netflix-deployment
                 """
             }
         }
     }
 
+    // ============================
+    // Pós execução
+    // ============================
     post {
         success {
-            echo "✅ Pipeline completed successfully!"
+            echo "✅ CI/CD Pipeline executed successfully!"
         }
 
         failure {
-            echo "❌ Pipeline failed. Check the console logs above."
+            echo "❌ Pipeline failed. Check logs above."
         }
     }
 }
+
