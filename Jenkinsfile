@@ -23,7 +23,7 @@ pipeline {
         stage("Install Dependencies") {
             steps {
                 echo "Installing project dependencies..."
-                sh "yarn install"
+                sh "npm install"
             }
         }
 
