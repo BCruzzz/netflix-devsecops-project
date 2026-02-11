@@ -35,32 +35,33 @@ pipeline {
         }
 
         stage("SonarQube Analysis") {
-            steps {
+	    steps {
                 echo "Running SonarQube Scan..."
 
-                script {
-                    // Usa o scanner configurado no Jenkins Global Tools
-                    def scannerHome = tool 'sonar-scanner'
+                   script {
+                       // pega o caminho completo do scanner instalado
+                       def scannerHome = tool 'sonar-scanner'
+
+                       withSonarQubeEnv("SonarQube") {
+
+                           withCredentials([string(
+                           credentialsId: "Sonar-token",
+                           variable: "SONAR_TOKEN"
+                       )]) {
+
+                           sh """
+                             ${scannerHome}/bin/sonar-scanner \
+                             -Dsonar.projectKey=Netflix \
+                             -Dsonar.projectName=Netflix \
+                             -Dsonar.host.url=http://172.31.6.195:9000 \
+                             -Dsonar.login=$SONAR_TOKEN
+                           """
+                         }
+                     }
                 }
+           }
+      }
 
-                withSonarQubeEnv("SonarQube") {
-
-                    withCredentials([string(
-                        credentialsId: "Sonar-token",
-                        variable: "SONAR_TOKEN"
-                    )]) {
-
-                        sh '''
-                          sonar-scanner \
-                            -Dsonar.projectKey=Netflix \
-                            -Dsonar.projectName=Netflix \
-                            -Dsonar.host.url=http://172.31.6.195:9000 \
-                            -Dsonar.login=$SONAR_TOKEN
-                        '''
-                    }
-                }
-            }
-        }
 
         // ============================
         // 4. Docker Build
