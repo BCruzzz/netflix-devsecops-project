@@ -1,95 +1,290 @@
-<div align="center">
-  <a href="http://netflix-clone-with-tmdb-using-react-mui.vercel.app/">
-    <img src="./public/assets/netflix-logo.png" alt="Logo" width="100" height="32">
-  </a>
+# 🎬 Netflix DevSecOps Project
 
-  <h3 align="center">Netflix Clone</h3>
+Projeto completo de CI/CD com deploy em Kubernetes (AWS EKS), incluindo
+containerização, análise de qualidade de código, monitoramento e
+integração contínua. 
 
-  <p align="center">
-    <a href="https://netflix-clone-react-typescript.vercel.app/">View Demo</a>
-    ·
-    <a href="https://github.com/crazy-man22/netflix-clone-react-typescript/issues">Report Bug</a>
-    ·
-    <a href="https://github.com/crazy-man22/netflix-clone-react-typescript/issues">Request Feature</a>
-  </p>
-</div>
+Não coloquei os códigos dos arquivos pois tudo foi criado numa EC2, nada foi feito localmente.
 
-<details>
-  <summary>Table of Contents</summary>
-  <ol>
-    <li>
-      <a href="#prerequests">Prerequests</a>
-    </li>
-    <li>
-      <a href="#which-features-this-project-deals-with">Which features this project deals with</a>
-    </li>
-    <li><a href="#third-party-libraries-used-except-for-react-and-rtk">Third Party libraries used except for React and RTK</a></li>
-    <li>
-      <a href="#contact">Contact</a>
-    </li>
-  </ol>
-</details>
+------------------------------------------------------------------------
 
-<br />
+# 📌 Objetivo do Projeto
 
-<div align="center">
-  <img src="./public/assets/home-page.png" alt="Logo" width="100%" height="100%">
-  <p align="center">Home Page</p>
-  <img src="./public/assets/mini-portal.png" alt="Logo" width="100%" height="100%">
-  <p align="center">Mini Portal</p>
-  <img src="./public/assets/detail-modal.png" alt="Logo" width="100%" height="100%">
-  <p align="center">Detail Modal</p>
-  <img src="./public/assets/grid-genre.png" alt="Logo" width="100%" height="100%">
-  <p align="center">Grid Genre Page</p>
-  <img src="./public/assets/watch.png" alt="Logo" width="100%" height="100%">
-  <p align="center">Watch Page with customer contol bar</p>
-</div>
+Construir um ambiente **DevSecOps real**, simulando um fluxo
+profissional de:
 
-## Prerequests
+-   Versionamento no GitHub
+-   Integração Contínua com Jenkins
+-   Análise de código com SonarQube
+-   Build e Push de imagem Docker
+-   Deploy automatizado em cluster Kubernetes (AWS EKS)
+-   Monitoramento com Prometheus + Grafana
 
-- Create an account if you don't have on [TMDB](https://www.themoviedb.org/).
-  Because I use its free API to consume movie/tv data.
-- And then follow the [documentation](https://developers.themoviedb.org/3/getting-started/introduction) to create API Key
-- Finally, if you use v3 of TMDB API, create a file named `.env`, and copy and paste the content of `.env.example`.
-  And then paste the API Key you just created.
+Este projeto foi executado manualmente, enfrentando e resolvendo
+problemas reais de infraestrutura, autenticação, permissões e integração
+entre ferramentas.
 
-## Which features this project deal with
+------------------------------------------------------------------------
 
-- How to create and use [Custom Hooks](https://reactjs.org/docs/hooks-custom.html)
-- How to use [Context](https://reactjs.org/docs/context.html) and its provider
-- How to use lazy and Suspense for [Code-Splitting](https://reactjs.org/docs/code-splitting.html)
-- How to use a new [lazy](https://reactrouter.com/en/main/route/lazy) feature of react-router to reduce bundle size.
-- How to use data [loader](https://reactrouter.com/en/main/route/loader) of react-router, and how to use redux dispatch in the loader to fetch data before rendering component.
-- How to use [Portal](https://reactjs.org/docs/portals.html)
-- How to use [Fowarding Refs](https://reactjs.org/docs/forwarding-refs.html) to make components reusuable
-- How to create and use [HOC](https://reactjs.org/docs/higher-order-components.html)
-- How to customize default theme of [MUI](https://mui.com/)
-- How to use [RTK](https://redux-toolkit.js.org/introduction/getting-started)
-- How to use [RTK Query](https://redux-toolkit.js.org/rtk-query/overview)
-- How to customize default classname of [MUI](https://mui.com/material-ui/experimental-api/classname-generator)
-- Infinite Scrolling(using [Intersection Observer API](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API))
-- How to make awesome carousel using [slick-carousel](https://react-slick.neostack.com)
+# 🏗️ Arquitetura Geral
 
-## Third Party libraries used except for React and RTK
-
-- [react-router-dom@v6.9](https://reactrouter.com/en/main)
-- [MUI(Material UI)](https://mui.com/)
-- [framer-motion](https://www.framer.com/docs/)
-- [video.js](https://videojs.com)
-- [react-slick](https://react-slick.neostack.com/)
-
-## Install with Docker
-
-```sh
-docker build --build-arg TMDB_V3_API_KEY=your_api_key_here -t netflix-clone .
-
-docker run --name netflix-clone-website --rm -d -p 80:80 netflix-clone
+``` text
+GitHub (Source Code)
+        ↓
+Jenkins (Pipeline CI/CD)
+        ↓
+SonarQube (Code Analysis)
+        ↓
+Docker Build
+        ↓
+DockerHub (Image Registry)
+        ↓
+AWS EKS (Kubernetes Cluster)
+        ↓
+Prometheus + Grafana (Monitoring)
 ```
 
-## Todo
+------------------------------------------------------------------------
 
-- Make the animation of video card portal more similar to Netflix.
-- Improve performance. I am using `context` and `provider` but all components subscribed to the context's value are re-rendered. These re-renders happen even if the part of the value is not used in render of the component. there are [several ways](https://blog.axlight.com/posts/4-options-to-prevent-extra-rerenders-with-react-context/) to prevent the re-renders from these behaviours. In addition to them, there may be several performance issues.
-- Replace bundler([Vite](https://vitejs.dev/guide)) with [Turbopack](https://turbo.build/pack/docs/why-turbopack). Turbopack is introduced in Next.js conf recently. It's very fast but it's nor ready to use right now. it just support Next.js, and they plan to support all others as soon as possible. so if it's ready to use, replace [Vite](https://vitejs.dev/guide) with [Turbopack](https://turbo.build/pack/docs/why-turbopack).
-- Add accessibilities for better UX.
-- Add Tests.
+# ☁️ Infraestrutura Provisionada
+
+## 🔹 AWS EC2 (Servidor CI)
+
+Utilizada para:
+
+-   Executar Jenkins em container
+-   Executar SonarQube em container
+-   Controlar deploy no EKS
+
+Configurações importantes: - Ubuntu Server - Docker instalado - Docker
+socket compartilhado com Jenkins
+
+------------------------------------------------------------------------
+
+# 🐳 Jenkins em Docker
+
+Jenkins rodando como container Docker customizado contendo:
+
+-   Docker CLI
+-   AWS CLI
+-   kubectl
+-   Git
+-   NodeJS
+
+### Execução com montagem do Docker Socket
+
+``` bash
+-v /var/run/docker.sock:/var/run/docker.sock
+```
+
+Permite que o Jenkins execute `docker build` e `docker push`.
+
+------------------------------------------------------------------------
+
+# 🔐 Gerenciamento de Credenciais
+
+Configurado no Jenkins:
+
+-   dockerhub-creds (username + token)
+-   SONAR_TOKEN (Secret Text)
+-   aws-access-key (Secret Text)
+-   aws-secret-key (Secret Text)
+-   TMDB_V3_API_KEY (Secret Text)
+
+Todas utilizadas via `withCredentials()`.
+
+------------------------------------------------------------------------
+
+# 🔍 SonarQube
+
+## Instalação
+
+Executado em container Docker separado.
+
+``` bash
+docker run -d -p 9000:9000 sonarqube
+```
+
+## Integração Jenkins
+
+-   Token gerado no SonarQube
+-   Configurado no Jenkins Global Tool Configuration
+-   Scanner configurado como "sonar-scanner"
+
+Pipeline executa:
+
+``` bash
+sonar-scanner \
+  -Dsonar.projectKey=Netflix \
+  -Dsonar.login=$SONAR_TOKEN
+```
+
+------------------------------------------------------------------------
+
+# 📦 Containerização
+
+## Dockerfile
+
+Build multi-stage para gerar aplicação estática e servir via nginx.
+
+``` dockerfile
+FROM node:16-alpine as builder
+WORKDIR /app
+COPY package.json .
+RUN npm install
+COPY . .
+RUN npm run build
+
+FROM nginx:stable-alpine
+WORKDIR /usr/share/nginx/html
+COPY --from=builder /app/dist .
+EXPOSE 80
+```
+
+------------------------------------------------------------------------
+
+# 📤 DockerHub
+
+-   Repositório criado manualmente
+-   Autenticação feita via token
+-   Push automático realizado pelo Jenkins
+
+``` bash
+docker push bmcruzz1/netflix-devsecops:latest
+```
+
+------------------------------------------------------------------------
+
+# ☸️ Kubernetes (AWS EKS)
+
+Cluster criado com:
+
+``` bash
+eksctl create cluster \
+  --name netflix-devsecops-cluster \
+  --region sa-east-1
+```
+
+Inclui:
+
+-   Control Plane gerenciado
+-   NodeGroup
+-   VPC automática
+-   IAM Roles
+
+------------------------------------------------------------------------
+
+# 📜 Manifests Kubernetes
+
+## deployment.yaml
+
+-   2 réplicas
+-   ImagePullPolicy Always
+-   Porta 80
+
+## service.yaml
+
+Tipo:
+
+``` yaml
+type: LoadBalancer
+```
+
+Resultado:
+
+-   ELB público gerado automaticamente
+-   Aplicação acessível via URL AWS
+
+------------------------------------------------------------------------
+
+# 🔄 Pipeline CI/CD
+
+## Fluxo completo:
+
+1.  Checkout do código
+2.  Instalação dependências
+3.  SonarQube Scan
+4.  Docker Build
+5.  Docker Push
+6.  Deploy no EKS
+7.  Rollout validation
+
+------------------------------------------------------------------------
+
+# 📊 Monitoramento
+
+Stack instalada via Helm:
+
+-   Prometheus
+-   Grafana
+-   kube-state-metrics
+
+Dashboards utilizados:
+
+-   Kubernetes Nodes
+-   Pods
+-   Deployments
+-   CPU / Memória
+
+------------------------------------------------------------------------
+
+# 🐛 Problemas Reais Enfrentados
+
+Durante o desenvolvimento, foram enfrentados e resolvidos problemas
+como:
+
+-   docker: permission denied
+-   sonar-scanner not found
+-   aws not found
+-   kubectl not found
+-   fatal: not in a git directory
+-   autenticação EKS via IAM
+-   AWS token via exec plugin
+-   permissões aws-auth no cluster
+-   falta de memória na EC2
+
+Cada problema exigiu troubleshooting técnico, análise de logs e ajustes
+estruturais na arquitetura.
+
+------------------------------------------------------------------------
+
+# 🧠 Conceitos Aplicados
+
+-   CI/CD real
+-   Docker-in-Docker via socket
+-   IAM + RBAC Kubernetes
+-   Credentials seguras no Jenkins
+-   Multi-stage builds
+-   Cluster externo com autenticação por token
+-   Rollout controlado com kubectl
+
+
+------------------------------------------------------------------------
+
+# 📈 Possíveis Melhorias Futuras
+
+-   Versionamento de imagem por build number
+-   Deploy canário
+-   ArgoCD
+-   Terraform para infraestrutura
+-   Jenkins dentro do EKS
+-   GitHub Actions alternativa
+-   Sonar Quality Gate bloqueando deploy
+
+------------------------------------------------------------------------
+
+# 👨‍💻 Autor
+
+Bruno Martins \
+Cloud & DevOps Engineer \
+
+------------------------------------------------------------------------
+
+# 🏁 Conclusão
+
+Este projeto representa uma implementação prática de um pipeline
+DevSecOps completo, abrangendo infraestrutura, automação, segurança,
+monitoramento e deploy em cloud.
+
+Foi desenvolvido com foco em aprendizado técnico profundo e resolução de
+problemas reais de integração entre ferramentas.
