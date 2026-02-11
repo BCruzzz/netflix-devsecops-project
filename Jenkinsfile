@@ -34,12 +34,14 @@ pipeline {
             }
         }
 
-        // ============================
-        // 3. SonarQube Scan (Token Seguro)
-        // ============================
         stage("SonarQube Analysis") {
             steps {
                 echo "Running SonarQube Scan..."
+
+                script {
+                    // Usa o scanner configurado no Jenkins Global Tools
+                    def scannerHome = tool 'sonar-scanner'
+                }
 
                 withSonarQubeEnv("SonarQube") {
 
@@ -48,13 +50,13 @@ pipeline {
                         variable: "SONAR_TOKEN"
                     )]) {
 
-                        sh """
+                        sh '''
                           sonar-scanner \
                             -Dsonar.projectKey=Netflix \
                             -Dsonar.projectName=Netflix \
                             -Dsonar.host.url=http://172.31.6.195:9000 \
                             -Dsonar.login=$SONAR_TOKEN
-                        """
+                        '''
                     }
                 }
             }
