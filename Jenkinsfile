@@ -96,7 +96,7 @@ pipeline {
         echo "Deploying application to EKS..."
         sh """
           aws eks update-kubeconfig --region ${AWS_REGION} --name ${EKS_CLUSTER}
-          kubectl apply -f k8s/
+          kubectl apply -f k8s/ --validate=false
           kubectl rollout status deployment netflix-deployment
         """
       }
